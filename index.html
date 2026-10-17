@@ -77,7 +77,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 
 /* result */
 .hero{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding-top:4px}
-.hero .lbl{font-size:14px;font-weight:700;color:var(--muted)}
+.hero .lbl{font-family:var(--display);font-size:26px;line-height:1.3;color:var(--ink)}
 .elev{display:flex;align-items:center;gap:10px;background:var(--ink);color:#FFD34D;border-radius:18px;padding:8px 20px;border:3px solid var(--ink);box-shadow:0 5px 0 rgba(28,28,40,.25)}
 .elev svg{width:20px;height:20px}
 .elev b{font-family:var(--display);font-weight:400;font-size:56px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
@@ -209,7 +209,7 @@ a.cta{display:block;text-align:center;text-decoration:none}
   <section id="result" hidden>
     <div style="display:flex;flex-direction:column;gap:18px;padding-bottom:8px">
       <div class="hero">
-        <span class="lbl">요즘 내 마음이 머무는 층</span>
+        <span id="myLbl" class="lbl">나의 의식 수준은 현재 9층!</span>
         <div class="elev" aria-live="polite"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3l6 7H4z" fill="#FFD34D"/></svg><b id="myFloor">9F</b></div>
         <p id="myLine" class="line"></p>
       </div>
@@ -219,7 +219,7 @@ a.cta{display:block;text-align:center;text-decoration:none}
         <p>요즘 많이 지치고 마음이 가라앉아 있는 것 같아요. 신디 상담사와 이야기를 나눠 보는 것도 좋아요. 마음이 너무 힘들 땐 자살예방상담전화 109, 정신건강위기상담전화 1577-0199에 언제든 전화할 수 있어요.</p>
       </div>
       <div class="box">
-        <h2>내 마음 빌딩</h2>
+        <h2>나의 의식 수준은 여기</h2>
         <p class="muted">층마다 얼마나 자주 머물렀는지 보여 줘요. 층을 누르면 그 층의 캐릭터를 만날 수 있어요.</p>
         <div id="tower" class="tower"></div>
       </div>
@@ -480,10 +480,10 @@ const F=[
  {n:6,v:'125',emo:'욕망',name:'볼빵빵 다람쥐',bg:'#F7E6D2',slogan:'조금만 더 있으면 괜찮을 텐데',traits:['볼이 터지게 채워도 금방 허전해요','남과 비교하며 부족함을 느껴요','원하는 게 생기면 그것만 보여요'],rel:'상대가 \'더\' 해 주길 바라며 서운함이 쌓여요.',key:'이미 가진 것 세 가지를 적어 보세요. 결핍을 보던 눈이 잠시 쉬어요.'},
  {n:7,v:'150',emo:'분노',name:'버럭 불꽃',bg:'#FCE0D6',slogan:'나도 할 말 있다고!',traits:['억울함에 순식간에 불이 붙어요','화가 나야 겨우 속마음이 나와요','그래도 바꾸고 싶은 에너지가 살아 있어요'],rel:'말이 세지고 싸움이 커진 뒤에 후회해요.',key:'화 밑에 있는 진짜 감정(서운함, 무서움)을 한 단어로 찾아보세요.'},
  {n:8,v:'175',emo:'자존심',name:'뽐냄 공작',bg:'#D9EFEC',slogan:'훗, 내가 틀릴 리 없지',traits:['지는 게 유난히 싫어요','인정받을 때 깃털이 활짝 펴져요','사과가 패배처럼 느껴져요'],rel:'누가 옳은지 겨루느라 마음은 멀어져요.',key:'\'이기고 싶은 걸까, 이해받고 싶은 걸까?\' 스스로 물어보세요.'},
- {n:9,v:'200',emo:'용기',name:'첫걸음 사자',bg:'#FCEDCF',slogan:'내가 할 수 있는 건 뭘까?',traits:['남 탓보다 내 몫을 먼저 봐요','무서워도 깃발 들고 한 걸음 나가요','여기서부터 삶을 살리는 힘이 시작돼요'],rel:'먼저 말을 꺼내고 먼저 다가갈 줄 알아요.',key:'결과에 매달리지 않는 연습을 하면 다음 층이 열려요.'},
+ {n:9,v:'200',emo:'용기',name:'첫걸음 사자',bg:'#FCEDCF',slogan:'내가 할 수 있는 건 뭘까?',traits:['남 탓보다 내 몫을 먼저 봐요','무서워도 한 걸음 먼저 내디뎌요','여기서부터 삶을 살리는 힘이 시작돼요'],rel:'먼저 말을 꺼내고 먼저 다가갈 줄 알아요.',key:'결과에 매달리지 않는 연습을 하면 다음 층이 열려요.'},
  {n:10,v:'250',emo:'중립',name:'식빵 고양이',bg:'#F1EDE5',slogan:'그럴 수도 있지~',traits:['뜻대로 안 돼도 차 한잔하며 넘겨요','남의 반응에 덜 휘둘려요','마음에 여백이 생겼어요'],rel:'상대의 기분에 휩쓸리지 않고 내 중심을 지켜요.',key:'여유가 생긴 자리에 \'해 보고 싶은 일\'을 하나 들여 보세요.'},
  {n:11,v:'310',emo:'자발성',name:'꼬리팡팡 강아지',bg:'#F8EBDC',slogan:'좋아, 해 보자!',traits:['억지가 아니라 기꺼이 움직여요','배우고 시도하는 게 신나요','넘어져도 꼬리 흔들며 다시 일어나요'],rel:'관계를 위한 노력을 부담이 아닌 선택으로 해요.',key:'내가 바꿀 수 없는 것까지 받아들이는 연습을 해 보세요.'},
- {n:12,v:'350',emo:'수용',name:'두팔벌려 코알라',bg:'#E8ECF0',slogan:'너는 너라서 괜찮아',traits:['상대를 바꾸려 애쓰지 않아요','힘든 감정도 품에 안아 줘요','내 삶의 책임을 내가 져요'],rel:'서로의 다름을 고칠 문제가 아니라 알아갈 차이로 봐요.',key:'감정을 받아들인 다음, 상황을 차분히 정리하는 힘을 길러 보세요.'},
+ {n:12,v:'350',emo:'수용',name:'두 팔 벌려 코알라',bg:'#E8ECF0',slogan:'너는 너라서 괜찮아',traits:['상대를 바꾸려 애쓰지 않아요','힘든 감정도 품에 안아 줘요','내 삶의 책임을 내가 져요'],rel:'서로의 다름을 고칠 문제가 아니라 알아갈 차이로 봐요.',key:'감정을 받아들인 다음, 상황을 차분히 정리하는 힘을 길러 보세요.'},
  {n:13,v:'400',emo:'이성',name:'안경 부엉이',bg:'#EEE4D8',slogan:'한 걸음 떨어져서 보자',traits:['감정이 격해도 상황을 정리할 수 있어요','이해하고 설명하는 걸 좋아해요','일 속에서 의미를 찾아요'],rel:'갈등을 서로의 입장을 이해하는 대화로 바꿔요.',key:'머리로 이해한 것을 가슴으로 느껴 보세요. 정답보다 마음이 먼저일 때가 있어요.'},
  {n:14,v:'500',emo:'사랑',name:'하트뿜뿜 고래',bg:'#DFE9FB',slogan:'네가 행복했으면 좋겠어',traits:['조건 없이 따뜻함을 뿜어요','남의 아픔에 진심으로 마음이 쓰여요','판단보다 이해가 앞서요'],rel:'상대가 해 주는 것보다 상대라는 사람 자체를 아껴요.',key:'주는 사랑 안에 나 자신도 꼭 포함시켜 주세요.'},
  {n:15,v:'540',emo:'기쁨',name:'깔깔 해바라기',bg:'#FFF4CC',slogan:'오늘도 고마운 게 많아',traits:['평범한 하루에서 기쁨을 찾아요','웃음이 많아 곁이 밝아져요','작은 일에도 감사가 먼저 나와요'],rel:'함께 있는 것만으로 서로에게 힘이 돼요.',key:'기쁨에도 매달리지 않는 고요함을 느껴 보세요.'},
@@ -597,12 +597,27 @@ function pick(v){
   setTimeout(()=>{lock=false;if(idx<Q.length-1){idx++;save();renderQ()}else finish()},200);
 }
 
+// 받침 여부로 '와/과'를 고른다
+function wa(w){const c=w.charCodeAt(w.length-1);return (c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28!==0)?'과':'와'}
 function means(){const s={},n={};F.forEach(c=>{s[c.n]=0;n[c.n]=0});Q.forEach(([f],i)=>{if(answers[i]){s[f]+=answers[i];n[f]++}});const m={};F.forEach(c=>m[c.n]=n[c.n]?s[c.n]/n[c.n]:0);return m}
 function decide(m){
-  let heavy=null;for(let f=1;f<=8;f++){if(m[f]>=TH&&(!heavy||m[f]>m[heavy]))heavy=f}
-  if(heavy)return heavy;
-  if(m[9]>=TH){let cur=9,f=10;while(f<=17){if(m[f]>=TH){cur=f;f++}else if(f+1<=17&&m[f+1]>=TH){cur=f+1;f+=2}else break}return cur}
-  let best=1;for(let f=1;f<=8;f++){if(m[f]>=m[best])best=f}return best;
+  // 포스(1~8층) = 평균과 가장 강한 감정을 반반 섞음: 강한 감정 하나가 마음을 끌어내리는 힘을 반영
+  // 파워(9~17층) = 평균. 두 힘의 차이로 200 위인지 아래인지 정한다.
+  const fv=[1,2,3,4,5,6,7,8].map(f=>m[f]), pv=[9,10,11,12,13,14,15,16,17].map(f=>m[f]);
+  const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+  const Fp=0.5*mean(fv)+0.5*Math.max(...fv), P=mean(pv), D=P-Fp;
+  if(D<0){
+    // 포스가 셀수록 더 깊은 층. 그 근처에서 가장 강하게 응답한 감정의 층을 고른다.
+    const L=Math.max(1,Math.min(8,9+2*D));
+    let best=1,bs=-1e9;for(let f=1;f<=8;f++){const s=m[f]-0.12*Math.abs(f-L);if(s>bs){bs=s;best=f}}
+    return best;
+  }
+  // 파워: 아래층보다 확실히 높게(+1점, 최소 3.25) 응답한 위층 수만큼 올라간다.
+  const cut=Math.max(3.25,Fp+1);
+  let count=0;for(let f=10;f<=17;f++)if(m[f]>=cut)count++;
+  const L=9+count;
+  let best=9,bs=-1e9;for(let f=Math.max(9,L-1);f<=Math.min(17,L+1);f++){const s=m[f]-0.6*Math.abs(f-L);if(s>bs){bs=s;best=f}}
+  return best;
 }
 
 let M=null,ME=null,VIEW=null;
@@ -630,7 +645,8 @@ function openPeek(f){
 function finish(){
   M=means();ME=decide(M);VIEW=null;const c=F[ME-1];
   $('myFloor').textContent=ME+'F';
-  $('myLine').textContent=ME>=9?`${c.emo} 층의 ${c.name}와 함께 지내고 있어요. 200을 넘어 삶을 살리는 힘이 움직이는 층이에요.`:`${c.emo} 층의 ${c.name}와 함께 지내고 있어요. 지금은 마음을 무겁게 하는 감정이 조금 크게 자리 잡고 있어요.`;
+  $('myLbl').textContent=`나의 의식 수준은 현재 ${ME}층!`;
+  $('myLine').textContent=ME>=9?`${c.emo} 층의 ${c.name}${wa(c.name)} 함께 지내고 있어요. 200을 넘어 삶을 살리는 힘이 움직이는 층이에요.`:`${c.emo} 층의 ${c.name}${wa(c.name)} 함께 지내고 있어요. 지금은 마음을 무겁게 하는 감정이 조금 크게 자리 잡고 있어요.`;
   $('myCard').innerHTML=card(c);
   $('peek').hidden=true;renderTower();
   $('warn').hidden=!(M[3]>=TH||M[4]>=TH);
