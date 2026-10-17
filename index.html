@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="수치심 1층부터 깨달음 17층까지. 최근 2주 동안 내 마음이 머문 층과 그 층의 캐릭터를 찾아 드려요.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sindy-floor-test.vercel.app/">
+<meta property="og:title" content="나의 의식 수준은 몇 층일까?">
+<meta property="og:description" content="수치심 1층부터 깨달음 17층까지, 내 마음이 머문 층을 찾아보세요. | 신디">
+<meta property="og:image" content="https://sindy-floor-test.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#D6ECFA">
+<title>나의 의식 수준은 몇 층일까? | 신디</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: phone-first single column (max 480). Deliberate single light look: Sindy sky-blue ground, black-outline flat illustrations, purple accent. Screens: cover / quiz / result. */
+:root{
+  color-scheme:light;
+  --sky:#D6ECFA; --sky-deep:#BFE0F6; --paper:#FFFFFF; --ink:#1C1C28; --muted:#55607A;
+  --accent:#6C4CE0; --accent-soft:#EFEAFF; --accent-ink:#3B2A8C;
+  --low:#EEF4FA; --line:#1C1C28; --warn:#FFF1DC; --warn-ink:#7A4300;
+  --display:'Jua','Noto Sans KR',system-ui,sans-serif;
+  --body:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{background:var(--sky);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.6;-webkit-tap-highlight-color:transparent;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 0}
+.app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:16px;min-height:100%}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.logo{display:flex;align-items:center;gap:7px;font-weight:900;font-size:19px;letter-spacing:-.01em}
+.logo i{width:11px;height:11px;border-radius:50%;background:var(--accent);display:block}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+
+/* sticky bottom CTA */
+.dock{position:sticky;bottom:0;padding:12px 0 calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,rgba(214,236,250,0),var(--sky) 30%);display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.cta{appearance:none;border:3px solid var(--ink);background:var(--accent);color:#fff;border-radius:18px;font-family:var(--display);font-size:22px;padding:14px 18px;min-height:60px;cursor:pointer;box-shadow:0 5px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.cta:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.sub{appearance:none;border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:700;min-height:44px;cursor:pointer}
+.meta{text-align:center;color:var(--muted);font-size:13px;font-weight:500}
+
+/* cover */
+.cover{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding-top:4px}
+.kicker{font-size:13px;font-weight:700;color:var(--accent-ink);background:var(--paper);border:2px solid var(--ink);border-radius:99px;padding:3px 12px}
+.cover h1{font-family:var(--display);font-weight:400;font-size:clamp(32px,9.2vw,42px);line-height:1.22;letter-spacing:-.01em}
+.cover h1 em{font-style:normal;color:var(--accent)}
+.building{width:100%;max-width:340px;height:auto}
+.lede{font-size:15px;color:var(--ink);max-width:34ch}
+.lede b{color:var(--accent-ink)}
+
+/* quiz */
+.qhead{display:flex;align-items:center;gap:10px}
+.iconbtn{appearance:none;border:0;background:transparent;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;cursor:pointer}
+.iconbtn svg{width:24px;height:24px}
+.iconbtn[disabled]{opacity:.25;cursor:default}
+.track{flex:1;height:12px;border:2.5px solid var(--ink);border-radius:99px;background:var(--paper);overflow:hidden}
+.track i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.count{font-family:var(--display);font-size:18px;min-width:52px;text-align:right;font-variant-numeric:tabular-nums}
+.qcard{background:var(--paper);border:3px solid var(--ink);border-radius:24px;padding:22px 20px;box-shadow:0 6px 0 var(--ink);display:flex;flex-direction:column;gap:10px}
+.qcard small{font-size:13px;font-weight:700;color:var(--muted)}
+.qcard p{font-size:21px;font-weight:700;line-height:1.5;min-height:4.5em;letter-spacing:-.01em}
+.opts{display:flex;flex-direction:column;gap:9px;padding-bottom:24px}
+.opt{appearance:none;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;min-height:56px;font-size:17px;font-weight:700;cursor:pointer;transition:transform .08s}
+.opt:active{transform:scale(.98)}
+.opt .pip{flex:none;display:flex;gap:3px}
+.opt .pip span{width:9px;height:18px;border-radius:3px;border:2px solid var(--ink);background:var(--paper)}
+.opt .pip span.f{background:var(--accent)}
+.opt[aria-pressed="true"]{background:var(--accent);color:#fff}
+.opt[aria-pressed="true"] .pip span{border-color:#fff}
+.opt[aria-pressed="true"] .pip span.f{background:#fff}
+
+/* result */
+.hero{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding-top:4px}
+.hero .lbl{font-size:14px;font-weight:700;color:var(--muted)}
+.elev{display:flex;align-items:center;gap:10px;background:var(--ink);color:#FFD34D;border-radius:18px;padding:8px 20px;border:3px solid var(--ink);box-shadow:0 5px 0 rgba(28,28,40,.25)}
+.elev svg{width:20px;height:20px}
+.elev b{font-family:var(--display);font-weight:400;font-size:56px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.hero .line{font-size:15px;max-width:32ch}
+
+.ccard{background:var(--paper);border:3px solid var(--ink);border-radius:28px;overflow:hidden;box-shadow:0 7px 0 var(--ink)}
+.ccard .face{position:relative;display:flex;flex-direction:column;align-items:center;padding:16px 16px 14px;border-bottom:3px solid var(--ink)}
+.ccard .tag{position:absolute;top:14px;font-family:var(--display);font-size:20px;background:var(--paper);border:2.5px solid var(--ink);border-radius:12px;padding:0 10px;line-height:1.5}
+.ccard .tag.l{left:14px}
+.ccard .tag.r{right:14px;font-family:var(--body);font-size:12px;font-weight:700;line-height:2;font-variant-numeric:tabular-nums}
+.ccard .face svg{width:min(58vw,210px);height:auto;margin-top:18px}
+.ccard .cname{font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}
+.ccard .emo{font-family:var(--display);font-size:40px;line-height:1.1}
+.ccard .bubble{position:relative;margin-top:10px;background:var(--paper);border:2.5px solid var(--ink);border-radius:16px;padding:6px 14px;font-weight:700;font-size:16px}
+.ccard .bubble::before{content:"";position:absolute;left:50%;top:-9px;width:14px;height:14px;background:var(--paper);border-left:2.5px solid var(--ink);border-top:2.5px solid var(--ink);transform:translateX(-50%) rotate(45deg)}
+.ccard .body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:16px}
+.ccard h3{font-size:13px;font-weight:900;letter-spacing:.06em;color:var(--accent-ink)}
+.ccard ul{margin:4px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.ccard li{display:flex;gap:8px;font-size:15px}
+.ccard li::before{content:"";flex:none;width:8px;height:8px;margin-top:9px;border-radius:50%;background:var(--ink)}
+.ccard .body p{font-size:15px;margin-top:4px}
+.ccard .key{background:var(--accent-soft);border:2px solid var(--ink);border-radius:16px;padding:12px 14px}
+.ccard .key p{margin-top:2px}
+
+.box{background:var(--paper);border:3px solid var(--ink);border-radius:24px;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.box h2{font-family:var(--display);font-weight:400;font-size:24px}
+.box .muted{font-size:13px;color:var(--muted)}
+.tower{display:flex;flex-direction:column;gap:4px}
+.fl{appearance:none;display:grid;grid-template-columns:38px 36px minmax(0,1fr) 64px;align-items:center;gap:8px;width:100%;text-align:left;background:var(--low);border:2px solid transparent;border-radius:12px;padding:3px 8px;min-height:44px;cursor:pointer;font-size:14px;font-weight:700}
+.fl.up{background:var(--accent-soft)}
+.fl.me{background:#FFD34D;border-color:var(--ink)}
+.fl.view{border-color:var(--accent)}
+.fl .n{font-family:var(--display);font-weight:400;font-size:17px;font-variant-numeric:tabular-nums}
+.fl svg{width:36px;height:36px}
+.fl .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl .nm small{font-weight:500;color:var(--muted);margin-left:4px;font-size:12px}
+.fl .m{height:9px;border:2px solid var(--ink);border-radius:99px;background:var(--paper);overflow:hidden}
+.fl .m i{display:block;height:100%;background:var(--ink)}
+.fl.up .m i{background:var(--accent)}
+.gate{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;color:var(--accent);letter-spacing:.04em;padding:4px 0}
+.gate::before,.gate::after{content:"";flex:1;border-top:2.5px dashed var(--accent)}
+.warn{background:var(--warn);color:var(--warn-ink);border:2.5px solid var(--ink);border-radius:20px;padding:14px 16px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.warn strong{font-size:15px}
+details.box summary{cursor:pointer;font-weight:900;font-size:15px;min-height:28px;list-style:none;display:flex;justify-content:space-between}
+details.box summary::after{content:"+";font-family:var(--display);font-size:22px;line-height:1}
+details[open].box summary::after{content:"–"}
+details.box ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+.sheet{display:flex;flex-direction:column;gap:10px}
+.ccard svg,.fl svg{overflow:visible}
+.fp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.fp .tile{border:2.5px solid var(--ink);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.fp .tile.force{background:var(--low)}
+.fp .tile.power{background:var(--accent-soft)}
+.fp .tile b{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.2}
+.fp .tile.power b{color:var(--accent)}
+.fp .tile span{font-size:12px;font-weight:700;color:var(--muted)}
+.fp .tile p{font-size:13.5px;line-height:1.55}
+.fpv{display:flex;flex-direction:column;gap:0;border:3px solid var(--ink);border-radius:20px;overflow:hidden}
+.blk{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;opacity:.5}
+.blk.power{background:var(--accent-soft)}
+.blk.force{background:#E6EBF1}
+.blk.on{opacity:1}
+.blk.power.on{background:#E3DAFF}
+.blk.force.on{background:#FFE7C2}
+.blk .bh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.blk .bh>div{display:flex;flex-direction:column}
+.blk .rg{font-size:12px;font-weight:700;color:var(--muted)}
+.blk b{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.2}
+.blk.power b{color:var(--accent)}
+.blk p{font-size:14px;line-height:1.6}
+.here-badge{flex:none;display:flex;align-items:center;gap:4px;background:#FFD34D;border:2.5px solid var(--ink);border-radius:99px;padding:2px 10px 2px 4px;font-size:13px;font-weight:900}
+.here-badge svg{width:34px;height:34px}
+.line200{position:relative;height:0;border-top:3px dashed var(--accent)}
+.line200 span{position:absolute;right:12px;top:-13px;background:var(--accent);color:#fff;font-size:12px;font-weight:900;padding:2px 10px;border-radius:99px;border:2px solid var(--ink)}
+.msg{display:flex;flex-direction:column;gap:10px;font-size:15.5px}
+.msg strong{font-family:var(--display);font-weight:400;font-size:21px;color:var(--accent-ink);line-height:1.35}
+a.cta{display:block;text-align:center;text-decoration:none}
+.btnrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.ghostbtn{appearance:none;border:2.5px solid var(--ink);background:var(--paper);border-radius:16px;font-weight:700;font-size:16px;min-height:52px;cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+.ghostbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;font-weight:700;padding:10px 16px;border-radius:99px;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.sheet .close{align-self:flex-end}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (prefers-reduced-motion:no-preference){
+  .bob{animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-4px)}}
+}
+</style>
+
+
+<style>html,body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="logo"><i aria-hidden="true"></i>Sindy</div><span id="topRight" class="meta"></span></div>
+
+  <!-- COVER -->
+  <section id="cover">
+    <div class="cover">
+      <span class="kicker">의식의 지도 17층 테스트</span>
+      <h1>나의 의식 수준은<br><em>몇 층</em>일까?</h1>
+      <div id="buildingSlot" style="width:100%;display:flex;justify-content:center"></div>
+      <p class="lede">수치심 1층부터 깨달음 17층까지. 최근 2주 동안 <b>내 마음이 머문 층</b>과 그 층의 캐릭터를 찾아 드려요.</p>
+    </div>
+    <div class="dock">
+      <button id="start" class="cta" type="button">내 층 찾으러 가기</button>
+      <button id="resume" class="sub" type="button" hidden>이어서 하기</button>
+      <p class="meta">34문항 · 약 5분 · 진단이 아닌 자기 성찰 도구예요</p>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" hidden>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="qhead">
+        <button id="back" class="iconbtn" type="button" aria-label="이전 문항"><svg viewBox="0 0 24 24" fill="none" stroke="#1C1C28" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div class="track" aria-hidden="true"><i id="bar"></i></div>
+        <span id="count" class="count">1/34</span>
+      </div>
+      <div class="qcard">
+        <small>최근 2주 동안 나는…</small>
+        <p id="qtext" aria-live="polite"></p>
+      </div>
+      <div id="opts" class="opts" role="group" aria-label="응답 선택"></div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" hidden>
+    <div style="display:flex;flex-direction:column;gap:18px;padding-bottom:8px">
+      <div class="hero">
+        <span class="lbl">요즘 내 마음이 머무는 층</span>
+        <div class="elev" aria-live="polite"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3l6 7H4z" fill="#FFD34D"/></svg><b id="myFloor">9F</b></div>
+        <p id="myLine" class="line"></p>
+      </div>
+      <div id="myCard"></div>
+      <div id="warn" class="warn" hidden>
+        <strong>혼자 견디지 않아도 돼요</strong>
+        <p>요즘 많이 지치고 마음이 가라앉아 있는 것 같아요. 신디 상담사와 이야기를 나눠 보는 것도 좋아요. 마음이 너무 힘들 땐 자살예방상담전화 109, 정신건강위기상담전화 1577-0199에 언제든 전화할 수 있어요.</p>
+      </div>
+      <div class="box">
+        <h2>내 마음 빌딩</h2>
+        <p class="muted">층마다 얼마나 자주 머물렀는지 보여 줘요. 층을 누르면 그 층의 캐릭터를 만날 수 있어요.</p>
+        <div id="tower" class="tower"></div>
+      </div>
+      <div id="peek" class="sheet" hidden></div>
+      <div class="box">
+        <h2>나를 움직이는 힘은?</h2>
+        <div class="fpv">
+          <div id="blkPower" class="blk power">
+            <div class="bh"><div><span class="rg">200 이상 · 9~17층</span><b>파워 Power</b></div><span class="here-badge" hidden>지금 여기</span></div>
+            <p>용기, 수용, 사랑처럼 삶을 살리는 힘이 흐르는 상태예요. 덜 애써도 단단해지고, 관계는 함께 걷는 길이 돼요.</p>
+          </div>
+          <div class="line200"><span>200 · 전환점</span></div>
+          <div id="blkForce" class="blk force">
+            <div class="bh"><div><span class="rg">200 아래 · 1~8층</span><b>포스 Force</b></div><span class="here-badge" hidden>지금 여기</span></div>
+            <p>수치심, 두려움, 분노처럼 나를 지키느라 힘을 쓰는 상태예요. 애쓰는데도 자꾸 지치고, 관계는 이기고 지는 싸움이 돼요.</p>
+          </div>
+        </div>
+        <div id="fpMsg" class="msg"></div>
+      </div>
+      <details class="box">
+        <summary>결과를 읽을 때</summary>
+        <ul>
+          <li>이 결과는 '몇 층짜리 사람'이라는 판정이 아니라 최근 2주의 마음 날씨예요. 언제든 변할 수 있어요.</li>
+          <li>호킨스의 숫자는 과학적으로 검증된 값이 아니고, 이 테스트도 타당화 전 예비 버전이에요.</li>
+        </ul>
+      </details>
+    </div>
+    <div class="dock">
+      <a class="cta" href="https://sindytown.com/counseling/be3acc7a-e5dd-49f9-ad3c-7dd01c94c865" target="_blank" rel="noopener">신디와 함께 의식 수준 높이기</a>
+      <div class="btnrow">
+        <button id="share" class="ghostbtn" type="button">공유하기</button>
+        <button id="retake" class="ghostbtn" type="button">다시 해 보기</button>
+      </div>
+    </div>
+    <div id="toast" class="toast" role="status" hidden></div>
+  </section>
+</div>
+
+<script>
+/* ===================== characters (black outline, flat) ===================== */
+const K='#1C1C28';
+const O=`stroke="${K}" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"`;
+const o=`stroke="${K}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"`;
+const shadow=`<ellipse cx="80" cy="148" rx="46" ry="6" fill="${K}" opacity=".12"/>`;
+const blush=(x1,x2,y)=>`<ellipse cx="${x1}" cy="${y}" rx="7" ry="4" fill="#F48FA0" opacity=".75"/><ellipse cx="${x2}" cy="${y}" rx="7" ry="4" fill="#F48FA0" opacity=".75"/>`;
+const drop=(x,y,s=1)=>`<path d="M${x} ${y} q${6*s} ${10*s} 0 ${14*s} q${-6*s} ${-4*s} 0 ${-14*s}z" fill="#8FD0F5" ${o}/>`;
+const T=(x,y,t,sz=14,fill=K)=>`<text x="${x}" y="${y}" text-anchor="middle" font-family="Jua,Noto Sans KR,sans-serif" font-size="${sz}" fill="${fill}">${t}</text>`;
+
+const ART={
+1:()=>`${shadow}
+ <ellipse cx="46" cy="134" rx="12" ry="8" fill="#C9DDB0" ${O}/><ellipse cx="114" cy="134" rx="12" ry="8" fill="#C9DDB0" ${O}/>
+ <path d="M22 126 Q22 50 80 48 Q138 50 138 126 Z" fill="#7FA67A" ${O}/>
+ <path d="M60 70 L80 60 L100 70 L100 94 L80 104 L60 94 Z" fill="#A6C79A" ${o}/>
+ <path d="M60 70 L40 64 M100 70 L120 64 M60 94 L36 104 M100 94 L124 104 M80 60 L80 48 M80 104 L80 124" ${o} fill="none"/>
+ <ellipse cx="80" cy="124" rx="22" ry="14" fill="#C9DDB0" ${O}/>
+ <circle cx="72" cy="120" r="3.2" fill="${K}"/><circle cx="88" cy="120" r="3.2" fill="${K}"/>
+ <path d="M63 125 l4-4 M67 127 l4-4 M89 127 l4-4 M93 125 l4-4" stroke="#E8607A" stroke-width="2.4" stroke-linecap="round"/>
+ <path d="M18 128 Q80 142 142 128 L142 134 Q80 150 18 134 Z" fill="#5E8459" ${O}/>
+ ${drop(126,40)}${drop(138,58,.7)}
+ ${T(42,38,'부끄…',15)}`,
+2:()=>`${shadow}
+ <ellipse cx="80" cy="118" rx="44" ry="30" fill="#B98B6A" ${O}/>
+ <circle cx="50" cy="34" r="12" fill="#B98B6A" ${O}/><circle cx="110" cy="34" r="12" fill="#B98B6A" ${O}/>
+ <circle cx="50" cy="34" r="5" fill="#E3BFA2"/><circle cx="110" cy="34" r="5" fill="#E3BFA2"/>
+ <circle cx="80" cy="62" r="34" fill="#B98B6A" ${O}/>
+ <ellipse cx="80" cy="76" rx="14" ry="10" fill="#E3BFA2" ${o}/>
+ <ellipse cx="80" cy="71" rx="5" ry="3.5" fill="${K}"/>
+ <path d="M60 54 L69 59 L60 64 M100 54 L91 59 L100 64" ${O} fill="none"/>
+ <path d="M58 46 L68 50 M102 46 L92 50" ${o}/>
+ <path d="M74 82 q3 -3 6 0 t6 0" ${o} fill="none"/>
+ <path d="M58 66 q-4 14 0 22 M102 66 q4 14 0 22" stroke="#8FD0F5" stroke-width="4" stroke-linecap="round" fill="none"/>
+ <rect x="46" y="98" width="68" height="34" rx="6" fill="#FFFFFF" ${O}/>
+ ${T(80,121,'미안해요',16)}
+ <circle cx="40" cy="114" r="9" fill="#B98B6A" ${O}/><circle cx="120" cy="114" r="9" fill="#B98B6A" ${O}/>
+ ${drop(122,22)}`,
+3:()=>`${shadow}
+ <path d="M14 140 Q14 112 44 108 Q50 78 80 78 Q112 78 116 108 Q146 110 146 138 Q80 150 14 140 Z" fill="#A99C88" ${O}/>
+ <ellipse cx="80" cy="104" rx="26" ry="18" fill="#E6DBC6" ${o}/>
+ <ellipse cx="68" cy="102" rx="9" ry="6" fill="#6E6152" transform="rotate(-15 68 102)"/><ellipse cx="92" cy="102" rx="9" ry="6" fill="#6E6152" transform="rotate(15 92 102)"/>
+ <path d="M63 102 L73 102 M87 102 L97 102" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+ <ellipse cx="80" cy="112" rx="4" ry="2.5" fill="${K}"/>
+ <path d="M74 117 q6 3 12 0" ${o} fill="none"/>${drop(86,118,.7)}
+ <path d="M30 126 Q20 140 34 142" ${O} fill="none"/><path d="M130 126 Q140 140 126 142" ${O} fill="none"/>
+ <rect x="98" y="26" width="40" height="20" rx="4" fill="#FFFFFF" ${O}/><rect x="138" y="32" width="5" height="8" rx="1" fill="${K}"/>
+ <rect x="102" y="30" width="5" height="12" rx="1" fill="#F26B4F"/>
+ ${T(124,41,'1%',12)}
+ ${T(48,64,'z',20,K)}${T(36,48,'z',14,K)}`,
+4:()=>`${shadow}
+ <path d="M30 96 Q12 96 14 78 Q16 60 36 62 Q40 36 68 38 Q88 22 108 40 Q136 38 138 66 Q154 72 148 90 Q144 100 130 98 Z" fill="#C3D2EA" ${O}/>
+ <path d="M58 66 L72 60 M102 66 L88 60" ${o}/>
+ <ellipse cx="66" cy="72" rx="5" ry="6" fill="${K}"/><ellipse cx="94" cy="72" rx="5" ry="6" fill="${K}"/>
+ <circle cx="68" cy="70" r="1.8" fill="#fff"/><circle cx="96" cy="70" r="1.8" fill="#fff"/>
+ <path d="M70 88 q5 -6 10 0 t10 0" ${O} fill="none"/>
+ <path d="M64 78 Q60 96 64 104 M96 78 Q100 96 96 104" stroke="#5FB4EC" stroke-width="5" stroke-linecap="round" fill="none"/>
+ <path d="M40 108 l-4 10 M58 112 l-4 10 M104 112 l-4 10 M122 108 l-4 10 M80 116 l-4 10" stroke="#5FB4EC" stroke-width="3.5" stroke-linecap="round"/>
+ <ellipse cx="80" cy="140" rx="40" ry="7" fill="#A9D8F5" ${o}/>
+ ${T(132,30,'흑…',14)}`,
+5:()=>`${shadow}
+ <path d="M54 66 Q44 8 62 6 Q76 6 72 64" fill="#F4F0F8" ${O}/><path d="M106 66 Q116 8 98 6 Q84 6 88 64" fill="#F4F0F8" ${O}/>
+ <path d="M60 50 Q56 22 63 16 M100 50 Q104 22 97 16" stroke="#F3B6C8" stroke-width="5" stroke-linecap="round" fill="none"/>
+ <path d="M42 20 q-6 6 0 12 M118 20 q6 6 0 12" ${o} fill="none"/>
+ <ellipse cx="80" cy="122" rx="30" ry="22" fill="#F4F0F8" ${O}/>
+ <circle cx="80" cy="86" r="36" fill="#F4F0F8" ${O}/>
+ <circle cx="66" cy="82" r="12" fill="#FFFFFF" ${O}/><circle cx="94" cy="82" r="12" fill="#FFFFFF" ${O}/>
+ <circle cx="67" cy="84" r="3" fill="${K}"/><circle cx="93" cy="84" r="3" fill="${K}"/>
+ <path d="M68 104 l4 -4 l4 4 l4 -4 l4 4 l4 -4 l4 4" ${o} fill="none"/>
+ <path d="M30 80 q-6 6 0 12 M24 76 q-8 10 0 20 M130 80 q6 6 0 12 M136 76 q8 10 0 20" ${o} fill="none"/>
+ <rect x="66" y="112" width="28" height="36" rx="5" fill="#2E2E44" ${O}/><rect x="70" y="117" width="20" height="24" rx="2" fill="#BFE0F6"/>
+ ${T(80,134,'1',13,'#E2574C')}
+ ${drop(118,52)}${drop(40,52,.8)}`,
+6:()=>`${shadow}
+ <path d="M112 132 Q156 120 146 72 Q138 42 112 52 Q130 64 124 90 Q118 112 104 120 Z" fill="#B86E33" ${O}/>
+ <ellipse cx="80" cy="118" rx="34" ry="26" fill="#D9934E" ${O}/>
+ <path d="M54 42 L58 22 L70 38 Z M106 42 L102 22 L90 38 Z" fill="#D9934E" ${O}/>
+ <circle cx="80" cy="66" r="32" fill="#D9934E" ${O}/>
+ <circle cx="52" cy="80" r="20" fill="#F2C08C" ${O}/><circle cx="108" cy="80" r="20" fill="#F2C08C" ${O}/>
+ <circle cx="68" cy="60" r="7" fill="${K}"/><circle cx="92" cy="60" r="7" fill="${K}"/>
+ <path d="M68 55 l1.6 3.4 3.4 .6 -2.6 2.4 .6 3.4 -3 -1.6 -3 1.6 .6 -3.4 -2.6 -2.4 3.4 -.6z" fill="#FFD34D"/>
+ <path d="M92 55 l1.6 3.4 3.4 .6 -2.6 2.4 .6 3.4 -3 -1.6 -3 1.6 .6 -3.4 -2.6 -2.4 3.4 -.6z" fill="#FFD34D"/>
+ <ellipse cx="80" cy="74" rx="4" ry="3" fill="${K}"/>
+ <ellipse cx="80" cy="84" rx="5" ry="4" fill="${K}"/>
+ <ellipse cx="62" cy="134" rx="10" ry="12" fill="#A86B3C" ${O}/><path d="M52 126 Q62 116 72 126" fill="#6E4524" ${o}/>
+ <ellipse cx="96" cy="136" rx="10" ry="12" fill="#A86B3C" ${O}/><path d="M86 128 Q96 118 106 128" fill="#6E4524" ${o}/>
+ <rect x="10" y="18" width="38" height="24" rx="10" fill="#FFFFFF" ${O}/>${T(29,36,'더!',16,'#E2574C')}`,
+7:()=>`${shadow}
+ <path d="M80 12 Q98 40 110 36 Q136 66 130 104 Q124 144 80 146 Q36 144 30 104 Q24 70 48 42 Q58 58 64 42 Q68 26 80 12 Z" fill="#F26B4F" ${O}/>
+ <path d="M80 60 Q92 76 102 76 Q112 100 106 118 Q98 136 80 136 Q62 136 54 118 Q48 100 60 80 Q70 84 80 60 Z" fill="#FFB54A"/>
+ <path d="M56 84 L74 92 M104 84 L86 92" stroke="${K}" stroke-width="5" stroke-linecap="round"/>
+ <circle cx="68" cy="98" r="4.5" fill="${K}"/><circle cx="92" cy="98" r="4.5" fill="${K}"/>
+ <path d="M64 112 Q80 104 96 112 Q96 128 80 128 Q64 128 64 112 Z" fill="${K}"/>
+ <path d="M68 112 L72 117 L76 112 L80 117 L84 112 L88 117 L92 112" stroke="#fff" stroke-width="2" fill="none"/>
+ <path d="M112 30 q6 -2 8 -8 M118 38 q6 0 10 -6 M108 24 q2 -6 -2 -10 M126 26 q4 -4 2 -10" stroke="#E2574C" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+ <path d="M18 70 q-8 -6 -4 -14 q8 -2 8 -10 M142 70 q8 -6 4 -14 q-8 -2 -8 -10" stroke="#9AA6B8" stroke-width="4" stroke-linecap="round" fill="none"/>
+ ${T(36,30,'버럭!',16,'#E2574C')}`,
+8:()=>`${shadow}
+ ${[-52,-31,-10,10,31,52].map(a=>`<g transform="rotate(${a} 80 112)"><ellipse cx="80" cy="50" rx="15" ry="34"fill="#4FA89B" ${O}/><ellipse cx="80" cy="26" rx="7" ry="9" fill="#2F6FB0" ${o}/><circle cx="80" cy="25" r="3" fill="#FFD34D"/></g>`).join('')}
+ <path d="M56 140 Q52 92 80 80 Q108 92 104 140 Z" fill="#2F86B8" ${O}/>
+ <circle cx="80" cy="72" r="22" fill="#2F86B8" ${O}/>
+ <path d="M66 50 L70 38 L76 46 L80 34 L84 46 L90 38 L94 50 Z" fill="#FFD34D" ${O}/>
+ <path d="M98 68 L114 62 L100 76 Z" fill="#F2B544" ${O}/>
+ <path d="M68 70 Q73 66 78 70 M84 68 Q89 64 94 68" ${O} fill="none"/>
+ <path d="M66 64 L78 62" ${o}/>
+ ${blush(66,94,80)}
+ ${T(132,30,'훗',18)}`,
+9:()=>`${shadow}
+ <path d="M44 100 Q30 140 52 146 L108 146 Q130 140 116 100 Z" fill="#E2574C" ${O}/>
+ ${Array.from({length:14},(_,i)=>{const a=i/14*Math.PI*2;return `<circle cx="${(80+44*Math.cos(a)).toFixed(1)}" cy="${(66+42*Math.sin(a)).toFixed(1)}" r="15" fill="#D9862B" ${O}/>`}).join('')}
+ <ellipse cx="80" cy="118" rx="26" ry="22" fill="#F2B544" ${O}/>
+ <circle cx="80" cy="66" r="36" fill="#F2B544" ${O}/>
+ <path d="M58 52 L74 56 M102 52 L86 56" stroke="${K}" stroke-width="4.5" stroke-linecap="round"/>
+ <circle cx="67" cy="64" r="4.5" fill="${K}"/><circle cx="93" cy="64" r="4.5" fill="${K}"/>
+ <path d="M74 76 L86 76 L80 82 Z" fill="${K}"/>
+ <path d="M66 86 Q80 102 94 86 Z" fill="${K}"/><path d="M72 92 Q80 96 88 92" stroke="#F08080" stroke-width="3" stroke-linecap="round" fill="none"/>
+ <circle cx="56" cy="122" r="9" fill="#F2B544" ${O}/><circle cx="104" cy="122" r="9" fill="#F2B544" ${O}/>
+ <rect x="2" y="6" width="44" height="22" rx="10" fill="#FFFFFF" ${O}/>${T(24,22,'가자!',14,'#E2574C')}`,
+10:()=>`${shadow}
+ <path d="M28 142 Q24 90 80 88 Q136 90 132 142 Z" fill="#E8E1D3" ${O}/>
+ <path d="M50 54 L54 22 L74 42 Z M110 54 L106 22 L86 42 Z" fill="#E8E1D3" ${O}/><path d="M56 44 L57 32 L65 40 Z M104 44 L103 32 L95 40 Z" fill="#F4B8C8"/>
+ <ellipse cx="80" cy="68" rx="38" ry="32" fill="#E8E1D3" ${O}/>
+ <path d="M52 50 Q58 46 64 52 M108 50 Q102 46 96 52" stroke="#C7B9A1" stroke-width="4" stroke-linecap="round" fill="none"/>
+ <path d="M60 66 L72 66 M88 66 L100 66" ${O}/>
+ <path d="M74 78 q3 4 6 0 q3 4 6 0" ${o} fill="none"/>
+ <path d="M40 76 L22 72 M40 82 L22 84 M120 76 L138 72 M120 82 L138 84" ${o}/>
+ ${blush(56,104,78)}
+ <path d="M112 116 L140 116 L136 140 L116 140 Z" fill="#FFFFFF" ${O}/><path d="M140 122 q8 2 0 10" ${o} fill="none"/>
+ <path d="M120 108 q-4 -6 0 -12 M130 108 q-4 -6 0 -12" ${o} fill="none"/>
+ ${T(128,26,'그럴 수도~',13)}`,
+11:()=>`${shadow}
+ <path d="M118 112 Q146 100 140 76" ${O} fill="none" stroke-width="7"/><path d="M118 112 Q146 100 140 76" stroke="#E6B47F" stroke-width="3" fill="none" stroke-linecap="round"/>
+ <path d="M146 70 q6 4 4 10 M150 88 q6 2 6 8" ${o} fill="none"/>
+ <ellipse cx="80" cy="120" rx="34" ry="26" fill="#E6B47F" ${O}/>
+ <circle cx="80" cy="66" r="34" fill="#E6B47F" ${O}/>
+ <path d="M50 44 Q30 52 36 86 Q46 90 54 66 Z" fill="#A86B3C" ${O}/><path d="M110 44 Q130 52 124 86 Q114 90 106 66 Z" fill="#A86B3C" ${O}/>
+ <circle cx="68" cy="62" r="6" fill="${K}"/><circle cx="92" cy="62" r="6" fill="${K}"/><circle cx="70" cy="60" r="2" fill="#fff"/><circle cx="94" cy="60" r="2" fill="#fff"/>
+ <ellipse cx="80" cy="76" rx="6" ry="4" fill="${K}"/>
+ <path d="M70 82 Q80 92 90 82" ${o} fill="none"/>
+ <path d="M76 86 Q76 102 84 102 Q90 100 88 86 Z" fill="#F58AA0" ${o}/>
+ <path d="M44 112 Q30 92 40 84" ${O} fill="none" stroke-width="10"/><path d="M44 112 Q30 92 40 84" stroke="#E6B47F" stroke-width="5" fill="none" stroke-linecap="round"/>
+ <path d="M80 32 L80 18" stroke="#3E8A45" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="72" cy="16" rx="8" ry="5" fill="#6CC070" ${o} transform="rotate(-25 72 16)"/><ellipse cx="88" cy="16" rx="8" ry="5" fill="#6CC070" ${o} transform="rotate(25 88 16)"/>
+ ${T(30,30,'할래요!',14)}`,
+12:()=>`${shadow}
+ <circle cx="36" cy="52" r="22" fill="#B8C0C8" ${O}/><circle cx="124" cy="52" r="22" fill="#B8C0C8" ${O}/>
+ <circle cx="36" cy="52" r="11" fill="#E8ECF0"/><circle cx="124" cy="52" r="11" fill="#E8ECF0"/>
+ <ellipse cx="80" cy="120" rx="34" ry="26" fill="#B8C0C8" ${O}/>
+ <path d="M50 108 Q20 96 14 78" ${O} fill="none" stroke-width="13"/><path d="M50 108 Q20 96 14 78" stroke="#B8C0C8" stroke-width="7" fill="none" stroke-linecap="round"/>
+ <path d="M110 108 Q140 96 146 78" ${O} fill="none" stroke-width="13"/><path d="M110 108 Q140 96 146 78" stroke="#B8C0C8" stroke-width="7" fill="none" stroke-linecap="round"/>
+ <circle cx="80" cy="68" r="36" fill="#B8C0C8" ${O}/>
+ <path d="M62 62 Q68 56 74 62 M86 62 Q92 56 98 62" ${O} fill="none"/>
+ <ellipse cx="80" cy="76" rx="9" ry="12" fill="#3B3F4A" ${o}/>
+ <path d="M72 94 Q80 100 88 94" ${o} fill="none"/>
+ ${blush(56,104,82)}
+ <path d="M80 136 C70 128 66 120 72 116 C76 114 80 118 80 120 C80 118 84 114 88 116 C94 120 90 128 80 136 Z" fill="#F06A8C" ${o}/>
+ ${T(80,22,'그랬구나~',15)}`,
+13:()=>`${shadow}
+ <path d="M46 52 L50 26 L66 42 Z M114 52 L110 26 L94 42 Z" fill="#9C7C5A" ${O}/>
+ <ellipse cx="80" cy="92" rx="44" ry="52" fill="#9C7C5A" ${O}/>
+ <ellipse cx="80" cy="108" rx="28" ry="30" fill="#D8C2A2" ${o}/>
+ <path d="M66 104 q4 4 8 0 M86 104 q4 4 8 0 M70 118 q4 4 8 0 M82 118 q4 4 8 0" ${o} fill="none"/>
+ <circle cx="62" cy="68" r="15" fill="#FFFFFF" ${O}/><circle cx="98" cy="68" r="15" fill="#FFFFFF" ${O}/>
+ <path d="M77 68 L83 68" ${O}/>
+ <circle cx="64" cy="70" r="5" fill="${K}"/><circle cx="100" cy="70" r="5" fill="${K}"/>
+ <path d="M74 80 L86 80 L80 90 Z" fill="#F2B544" ${O}/>
+ <path d="M48 120 L80 112 L112 120 L112 144 L80 136 L48 144 Z" fill="#FFFFFF" ${O}/><path d="M80 112 L80 136" ${o}/>
+ <path d="M56 124 L72 120 M56 130 L72 126 M88 120 L104 124 M88 126 L104 130" stroke="#9AA6B8" stroke-width="2" stroke-linecap="round"/>
+ <circle cx="128" cy="26" r="11" fill="#FFE066" ${O}/><path d="M124 38 L132 38 M125 42 L131 42" ${o}/>
+ <path d="M128 8 L128 2 M144 14 L149 10 M112 14 L107 10" ${o}/>`,
+14:()=>`${shadow}
+ <path d="M18 96 Q16 58 64 54 Q118 50 128 88 Q140 82 150 66 Q156 92 140 104 Q154 112 156 132 Q138 124 126 112 Q110 136 66 136 Q22 134 18 96 Z" fill="#7FA7E8" ${O}/>
+ <path d="M26 104 Q60 126 112 112 Q100 132 66 134 Q32 132 26 104 Z" fill="#DCE7FA"/>
+ <path d="M52 88 Q58 82 64 88" ${O} fill="none"/>
+ <path d="M38 104 Q48 112 58 104" ${o} fill="none"/>
+ ${blush(46,72,98)}
+ <path d="M62 52 Q60 40 64 34" ${o} fill="none"/>
+ <path d="M64 30 C54 22 50 14 56 10 C60 8 64 12 64 14 C64 12 68 8 72 10 C78 14 74 22 64 30 Z" fill="#F06A8C" ${o}/>
+ <path d="M44 34 C38 30 36 26 39 24 C41 23 44 25 44 26 C44 25 46 23 49 24 C52 26 50 30 44 34 Z" fill="#F06A8C" ${o}/>
+ <path d="M86 26 C80 22 78 18 81 16 C83 15 86 17 86 18 C86 17 88 15 91 16 C94 18 92 22 86 26 Z" fill="#F06A8C" ${o}/>
+ ${T(116,40,'사랑해~',14)}`,
+15:()=>`${shadow}
+ <path d="M80 98 L80 146" stroke="#3E8A45" stroke-width="7" stroke-linecap="round"/><path d="M80 98 L80 146" stroke="#6CC070" stroke-width="3" stroke-linecap="round"/>
+ <path d="M80 128 Q56 108 46 124 Q60 136 80 128 Z M80 120 Q104 100 114 116 Q100 128 80 120 Z" fill="#6CC070" ${O}/>
+ ${Array.from({length:14},(_,i)=>`<ellipse cx="80" cy="16" rx="10" ry="20" fill="#FFD34D" ${o} transform="rotate(${i*360/14} 80 58)"/>`).join('')}
+ <circle cx="80" cy="58" r="30" fill="#F2A93B" ${O}/>
+ <path d="M64 52 Q70 44 76 52 M84 52 Q90 44 96 52" ${O} fill="none"/>
+ <path d="M64 62 Q80 84 96 62 Z" fill="${K}"/><path d="M70 70 Q80 76 90 70" stroke="#F08080" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+ ${blush(60,100,62)}
+ <path d="M24 30 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z M140 96 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#FFFFFF" ${o}/>
+ ${T(132,140,'하하!',15)}`,
+16:()=>`${shadow}
+ <ellipse cx="80" cy="140" rx="60" ry="8" fill="#A9D8F5" ${o}/>
+ ${[-64,-32,0,32,64].map(a=>`<path d="M80 136 Q62 106 80 80 Q98 106 80 136 Z" fill="#F7C6D4" ${o} transform="rotate(${a} 80 136)"/>`).join('')}
+ <ellipse cx="80" cy="112" rx="28" ry="20" fill="#FFF2F5" ${O}/>
+ <circle cx="80" cy="74" r="26" fill="#FFF2F5" ${O}/>
+ <path d="M66 74 Q71 79 76 74 M84 74 Q89 79 94 74" ${O} fill="none"/>
+ <path d="M74 86 Q80 90 86 86" ${o} fill="none"/>
+ ${blush(64,96,82)}
+ <path d="M74 106 L80 96 L86 106" fill="#FFF2F5" ${O}/>
+ <path d="M58 40 q-6 -6 0 -12 M102 40 q6 -6 0 -12 M80 36 q-4 -6 0 -12" stroke="#B9A7E8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+ ${T(132,56,'후~',16)}`,
+17:()=>`${shadow}
+ ${Array.from({length:12},(_,i)=>{const a=i*30*Math.PI/180;return `<path d="M${(80+52*Math.cos(a)).toFixed(1)} ${(80+52*Math.sin(a)).toFixed(1)} L${(80+66*Math.cos(a)).toFixed(1)} ${(80+66*Math.sin(a)).toFixed(1)}" stroke="#F2B544" stroke-width="4" stroke-linecap="round"/>`}).join('')}
+ <ellipse cx="80" cy="22" rx="24" ry="7" fill="none" stroke="${K}" stroke-width="7"/><ellipse cx="80" cy="22" rx="24" ry="7" fill="none" stroke="#FFE066" stroke-width="3.5"/>
+ <path d="M80 34 L93 64 L126 66 L101 87 L109 120 L80 102 L51 120 L59 87 L34 66 L67 64 Z" fill="#FFE066" ${O}/>
+ <path d="M68 78 Q73 83 78 78 M82 78 Q87 83 92 78" ${O} fill="none"/>
+ <path d="M74 90 Q80 95 86 90" ${o} fill="none"/>
+ ${blush(64,96,86)}
+ <path d="M26 128 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z M136 124 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#FFFFFF" ${o}/>`
+};
+function art(n,label){return `<svg viewBox="-18 -10 196 172"${label?`role="img" aria-label="${label}"`:'aria-hidden="true"'}>${ART[n]()}</svg>`}
+function artInner(n){return ART[n]()}
+
+/* ===================== data ===================== */
+const F=[
+ {n:1,v:'20',emo:'수치심',name:'숨숨이 거북',bg:'#E4EEDC',slogan:'나 같은 게 뭘…',traits:['실수를 \'나라는 사람\'의 결함으로 느껴요','칭찬을 들어도 믿기 어려워요','들킬까 봐 껍질 속으로 쏙 숨어요'],rel:'서운해도 말하지 못하고 혼자 껍질 속으로 들어가요.',key:'실수한 나에게, 친구에게 하듯 다정한 한 문장을 건네 보세요.'},
+ {n:2,v:'30',emo:'죄책감',name:'미안곰',bg:'#F2E5DA',slogan:'다 내 잘못이야',traits:['일이 꼬이면 자동으로 나를 탓해요','지난 실수를 오래 곱씹어요','쉬는 것조차 미안해요'],rel:'상대 기분이 나쁘면 내가 뭘 잘못했는지부터 찾아요.',key:'\'내 책임\'과 \'내 탓\'을 구분해 보세요. 책임은 고칠 수 있지만 탓은 나를 묶어 두기만 해요.'},
+ {n:3,v:'50',emo:'무기력',name:'녹은 늘보',bg:'#ECE6DA',slogan:'해 봤자 뭐 해',traits:['배터리 1%처럼 시작할 힘이 없어요','기대를 접는 게 차라리 편해요','즐겁던 일도 시들해요'],rel:'대화를 포기하고 각자 방으로 흩어지기 쉬워요.',key:'오늘 할 수 있는 아주 작은 일 하나만 정해서 해 보세요.'},
+ {n:4,v:'75',emo:'슬픔',name:'눈물 구름',bg:'#DFE8F5',slogan:'그때가 자꾸 생각나',traits:['잃어버린 것에 마음이 오래 머물러요','눈물이 쉽게 차올라요','지금보다 과거가 더 선명해요'],rel:'위로받고 싶지만 먼저 기대기는 어려워요.',key:'슬픔을 서둘러 끝내려 하지 말고, 믿을 수 있는 한 사람에게 꺼내 보세요.'},
+ {n:5,v:'100',emo:'두려움',name:'덜덜 토끼',bg:'#EEE8F5',slogan:'혹시 떠나면 어떡하지',traits:['답장이 늦으면 최악부터 상상해요','안전한 선택만 하고 싶어요','상대 표정을 자주 살펴요'],rel:'연락이 늦으면 불안이 커지고 자꾸 확인하고 싶어져요.',key:'\'실제로 일어난 일\'과 \'내가 걱정하는 일\'을 나눠 적어 보세요.'},
+ {n:6,v:'125',emo:'욕망',name:'볼빵빵 다람쥐',bg:'#F7E6D2',slogan:'조금만 더 있으면 괜찮을 텐데',traits:['볼이 터지게 채워도 금방 허전해요','남과 비교하며 부족함을 느껴요','원하는 게 생기면 그것만 보여요'],rel:'상대가 \'더\' 해 주길 바라며 서운함이 쌓여요.',key:'이미 가진 것 세 가지를 적어 보세요. 결핍을 보던 눈이 잠시 쉬어요.'},
+ {n:7,v:'150',emo:'분노',name:'버럭 불꽃',bg:'#FCE0D6',slogan:'나도 할 말 있다고!',traits:['억울함에 순식간에 불이 붙어요','화가 나야 겨우 속마음이 나와요','그래도 바꾸고 싶은 에너지가 살아 있어요'],rel:'말이 세지고 싸움이 커진 뒤에 후회해요.',key:'화 밑에 있는 진짜 감정(서운함, 무서움)을 한 단어로 찾아보세요.'},
+ {n:8,v:'175',emo:'자존심',name:'뽐냄 공작',bg:'#D9EFEC',slogan:'훗, 내가 틀릴 리 없지',traits:['지는 게 유난히 싫어요','인정받을 때 깃털이 활짝 펴져요','사과가 패배처럼 느껴져요'],rel:'누가 옳은지 겨루느라 마음은 멀어져요.',key:'\'이기고 싶은 걸까, 이해받고 싶은 걸까?\' 스스로 물어보세요.'},
+ {n:9,v:'200',emo:'용기',name:'첫걸음 사자',bg:'#FCEDCF',slogan:'내가 할 수 있는 건 뭘까?',traits:['남 탓보다 내 몫을 먼저 봐요','무서워도 깃발 들고 한 걸음 나가요','여기서부터 삶을 살리는 힘이 시작돼요'],rel:'먼저 말을 꺼내고 먼저 다가갈 줄 알아요.',key:'결과에 매달리지 않는 연습을 하면 다음 층이 열려요.'},
+ {n:10,v:'250',emo:'중립',name:'식빵 고양이',bg:'#F1EDE5',slogan:'그럴 수도 있지~',traits:['뜻대로 안 돼도 차 한잔하며 넘겨요','남의 반응에 덜 휘둘려요','마음에 여백이 생겼어요'],rel:'상대의 기분에 휩쓸리지 않고 내 중심을 지켜요.',key:'여유가 생긴 자리에 \'해 보고 싶은 일\'을 하나 들여 보세요.'},
+ {n:11,v:'310',emo:'자발성',name:'꼬리팡팡 강아지',bg:'#F8EBDC',slogan:'좋아, 해 보자!',traits:['억지가 아니라 기꺼이 움직여요','배우고 시도하는 게 신나요','넘어져도 꼬리 흔들며 다시 일어나요'],rel:'관계를 위한 노력을 부담이 아닌 선택으로 해요.',key:'내가 바꿀 수 없는 것까지 받아들이는 연습을 해 보세요.'},
+ {n:12,v:'350',emo:'수용',name:'두팔벌려 코알라',bg:'#E8ECF0',slogan:'너는 너라서 괜찮아',traits:['상대를 바꾸려 애쓰지 않아요','힘든 감정도 품에 안아 줘요','내 삶의 책임을 내가 져요'],rel:'서로의 다름을 고칠 문제가 아니라 알아갈 차이로 봐요.',key:'감정을 받아들인 다음, 상황을 차분히 정리하는 힘을 길러 보세요.'},
+ {n:13,v:'400',emo:'이성',name:'안경 부엉이',bg:'#EEE4D8',slogan:'한 걸음 떨어져서 보자',traits:['감정이 격해도 상황을 정리할 수 있어요','이해하고 설명하는 걸 좋아해요','일 속에서 의미를 찾아요'],rel:'갈등을 서로의 입장을 이해하는 대화로 바꿔요.',key:'머리로 이해한 것을 가슴으로 느껴 보세요. 정답보다 마음이 먼저일 때가 있어요.'},
+ {n:14,v:'500',emo:'사랑',name:'하트뿜뿜 고래',bg:'#DFE9FB',slogan:'네가 행복했으면 좋겠어',traits:['조건 없이 따뜻함을 뿜어요','남의 아픔에 진심으로 마음이 쓰여요','판단보다 이해가 앞서요'],rel:'상대가 해 주는 것보다 상대라는 사람 자체를 아껴요.',key:'주는 사랑 안에 나 자신도 꼭 포함시켜 주세요.'},
+ {n:15,v:'540',emo:'기쁨',name:'깔깔 해바라기',bg:'#FFF4CC',slogan:'오늘도 고마운 게 많아',traits:['평범한 하루에서 기쁨을 찾아요','웃음이 많아 곁이 밝아져요','작은 일에도 감사가 먼저 나와요'],rel:'함께 있는 것만으로 서로에게 힘이 돼요.',key:'기쁨에도 매달리지 않는 고요함을 느껴 보세요.'},
+ {n:16,v:'600',emo:'평화',name:'명상 연꽃',bg:'#FCE8EE',slogan:'흔들려도 바닥은 고요해',traits:['큰일에도 마음 깊은 곳이 잔잔해요','애쓰지 않아도 편안해요','비교할 필요를 느끼지 않아요'],rel:'갈등이 와도 관계의 바닥이 흔들리지 않아요.',key:'지금의 평화를 만든 습관을 기억해 두세요. 흔들리는 날 돌아올 길이 돼요.'},
+ {n:17,v:'700~1000',emo:'깨달음',name:'반짝 별님',bg:'#FFF7D1',slogan:'지금 이대로 충분해',traits:['\'나\'를 증명하려는 마음이 거의 없어요','모든 것이 이어져 있다고 느껴요','호킨스가 말한 지도의 꼭대기예요'],rel:'상대와 나를 나누지 않는 깊은 연결을 느껴요.',key:'이 층은 머무는 곳이라기보다 가끔 스치는 순간이에요. 그 순간을 소중히 간직하세요.'}
+];
+const ITEMS={
+ 1:['내가 부끄러운 존재처럼 느껴져 숨고 싶다.','내 진짜 모습을 알면 사람들이 실망할 것 같다.'],
+ 2:['과거에 한 실수가 떠올라 오랫동안 나를 괴롭힌다.','일이 잘못되면 다 내 탓인 것 같다.'],
+ 3:['노력해도 달라지는 게 없다는 생각에 손을 놓게 된다.','배우자(또는 가까운 사람)와의 관계가 나아질 거라는 기대를 접었다.'],
+ 4:['지나간 일에 대한 아쉬움과 슬픔에 자주 잠긴다.','이유 없이 마음이 가라앉고 눈물이 날 것 같다.'],
+ 5:['상대가 나를 떠나거나 나에게 실망할까 봐 불안하다.','앞으로 안 좋은 일이 생길 것 같아 마음이 편하지 않다.'],
+ 6:['인정이나 사랑을 더 받아야 비로소 괜찮아질 것 같다.','원하는 게 채워지지 않으면 쉽게 초조하고 허전해진다.'],
+ 7:['상대의 말이나 행동에 쉽게 화가 치민다.','서운한 일이 생기면 오래 곱씹으며 억울해한다.'],
+ 8:['잘못을 인정하면 지는 것 같아서 사과가 어렵다.','다툴 때 내가 옳다는 걸 끝까지 증명하고 싶다.'],
+ 9:['문제가 생기면 남 탓보다 \'내가 할 수 있는 게 뭘까\'를 먼저 생각한다.','두렵더라도 필요한 말이나 행동은 해 본다.'],
+ 10:['일이 뜻대로 안 돼도 \'그럴 수 있지\' 하고 넘길 수 있다.','상대의 반응에 크게 휘둘리지 않고 내 중심을 지킨다.'],
+ 11:['새로운 시도나 배움에 기꺼이 마음이 열린다.','관계를 위해 해야 할 일을 억지가 아니라 기꺼이 한다.'],
+ 12:['상대가 나와 달라도 그 사람을 있는 그대로 받아들일 수 있다.','힘든 감정이 올라와도 밀어내지 않고 지켜볼 수 있다.'],
+ 13:['감정이 격해져도 상황을 한 걸음 떨어져서 바라볼 수 있다.','갈등이 생기면 서로의 입장을 차분히 정리해 이해하려 한다.'],
+ 14:['다른 사람의 아픔에 진심으로 마음이 쓰인다.','상대가 나에게 무언가를 해 주지 않아도 따뜻한 마음을 줄 수 있다.'],
+ 15:['평범한 일상 속에서도 감사하고 즐거운 순간을 자주 느낀다.','마음이 가볍고 저절로 웃음이 나는 날이 많다.'],
+ 16:['특별한 일이 없어도 마음 깊은 곳이 고요하고 편안하다.','갈등이 있어도 마음의 바닥은 흔들리지 않는다.'],
+ 17:['\'나\'를 증명하려는 마음 없이 지금 이대로 충분하다고 느낀다.','모든 사람과 삶이 깊이 연결되어 있다는 느낌이 든다.']
+};
+const ORDER1=[1,9,5,13,3,11,7,15,2,10,6,14,4,12,8,16,17];
+const ORDER2=[12,4,16,8,10,2,14,6,17,9,1,13,5,11,3,15,7];
+const Q=[...ORDER1.map(f=>[f,ITEMS[f][0]]),...ORDER2.map(f=>[f,ITEMS[f][1]])];
+const LABELS=['거의 없었다','가끔','보통','자주','거의 항상'];
+const KEY='sindy-moc17-v2', TH=3.5;
+let answers=new Array(Q.length).fill(0), idx=0, lock=false;
+const $=id=>document.getElementById(id);
+
+/* ===================== cover building ===================== */
+function building(){
+  const floors=[];
+  const y0=60, h=15.6; // 17 floors from y=60 to y≈325
+  for(let i=0;i<17;i++){
+    const f=17-i, y=y0+i*h, up=f>=9;
+    floors.push(`<rect x="96" y="${y}" width="128" height="${h}" fill="${up?'#F3EFFF':'#FFFFFF'}"/>`);
+    floors.push(`<path d="M96 ${y+h} L224 ${y+h}" stroke="${K}" stroke-width="1.4" opacity=".35"/>`);
+    for(let w=0;w<4;w++){if(!((f===9&&w>1)||(f===1&&w<2)))floors.push(`<rect x="${106+w*28}" y="${y+4}" width="18" height="${h-8}" rx="2" fill="${up?'#D9CEFF':'#BFE0F6'}" ${o}/>`)}
+    if(f%2===1||f===17) floors.push(`<text x="86" y="${y+h-4}" text-anchor="end" font-family="Jua,sans-serif" font-size="11" fill="${K}">${f}F</text>`);
+  }
+  const gateY=y0+8*h+h; // between 9F and 8F
+  return `<svg class="building" viewBox="0 0 320 352" role="img" aria-label="1층부터 17층까지 있는 마음 빌딩. 1층에는 거북, 9층에는 사자, 옥상에는 별님 캐릭터가 있어요.">
+  <circle cx="50" cy="70" r="18" fill="#FFFFFF" opacity=".8"/><circle cx="66" cy="66" r="14" fill="#FFFFFF" opacity=".8"/>
+  <circle cx="268" cy="120" r="16" fill="#FFFFFF" opacity=".8"/><circle cx="282" cy="116" r="12" fill="#FFFFFF" opacity=".8"/>
+  <rect x="88" y="44" width="144" height="18" rx="4" fill="#FFFFFF" ${O}/>
+  <rect x="96" y="60" width="128" height="${17*h}" fill="#FFFFFF" ${O}/>
+  ${floors.join('')}
+  <rect x="96" y="60" width="128" height="${17*h}" fill="none" ${O}/>
+  <path d="M90 ${gateY} L230 ${gateY}" stroke="#6C4CE0" stroke-width="3" stroke-dasharray="6 5"/>
+  <rect x="236" y="${gateY-11}" width="66" height="22" rx="11" fill="#6C4CE0" ${o}/>
+  <text x="269" y="${gateY+5}" text-anchor="middle" font-family="Jua,sans-serif" font-size="12" fill="#FFFFFF">200 용기</text>
+  <rect x="134" y="${60+17*h-1}" width="52" height="8" fill="#FFFFFF" ${o}/>
+  <path d="M60 ${60+17*h+7} L260 ${60+17*h+7}" ${O}/>
+  <rect x="128" y="14" width="64" height="28" rx="6" fill="${K}"/>
+  <text x="160" y="35" text-anchor="middle" font-family="Jua,sans-serif" font-size="20" fill="#FFD34D">? F</text>
+  <svg x="186" y="-10" width="66" height="66" viewBox="0 0 160 160" class="bob">${artInner(17)}</svg>
+  <svg x="160" y="${y0+8*h-22}" width="58" height="58" viewBox="0 0 160 160">${artInner(9)}</svg>
+  <svg x="84" y="${y0+16*h-36}" width="56" height="56" viewBox="0 0 160 160">${artInner(1)}</svg>
+  <svg x="20" y="${y0+10*h-6}" width="58" height="58" viewBox="0 0 160 160">${artInner(7)}</svg>
+  <svg x="236" y="${y0+3*h-4}" width="60" height="60" viewBox="0 0 160 160">${artInner(14)}</svg>
+  </svg>`;
+}
+$('buildingSlot').innerHTML=building();
+
+/* ===================== cards ===================== */
+function card(c){
+  return `<article class="ccard" aria-label="${c.n}층 ${c.emo} 카드">
+   <div class="face" style="background:${c.bg}">
+     <span class="tag l">${c.n}F</span><span class="tag r">호킨스 ${c.v}</span>
+     ${art(c.n,c.name+' 캐릭터')}
+     <span class="cname">${c.name}</span>
+     <span class="emo">${c.emo}</span>
+     <span class="bubble">"${c.slogan}"</span>
+   </div>
+   <div class="body">
+     <div><h3>이 층의 특징</h3><ul>${c.traits.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+     <div><h3>관계에서는</h3><p>${c.rel}</p></div>
+     <div class="key"><h3>${c.n<17?'다음 층으로 가는 열쇠':'이 층을 대하는 법'}</h3><p>${c.key}</p></div>
+   </div></article>`;
+}
+
+/* ===================== flow ===================== */
+function save(){try{localStorage.setItem(KEY,JSON.stringify({answers,idx}))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.answers)&&s.answers.length===Q.length)return s}catch(e){}return null}
+function clear(){try{localStorage.removeItem(KEY)}catch(e){}}
+function show(id){['cover','quiz','result'].forEach(s=>$(s).hidden=s!==id);$('topRight').textContent=id==='quiz'?'최근 2주 기준':'';window.scrollTo(0,0)}
+
+function renderQ(){
+  $('count').textContent=(idx+1)+'/'+Q.length;
+  $('bar').style.width=((idx+1)/Q.length*100)+'%';
+  $('qtext').textContent=Q[idx][1];
+  $('back').disabled=idx===0;
+  const box=$('opts');box.textContent='';
+  LABELS.forEach((lab,i)=>{
+    const b=document.createElement('button');b.type='button';b.className='opt';b.id='opt-'+(i+1);
+    b.setAttribute('aria-pressed',answers[idx]===i+1?'true':'false');
+    const pip=document.createElement('span');pip.className='pip';pip.setAttribute('aria-hidden','true');
+    for(let k=0;k<5;k++){const s=document.createElement('span');if(k<=i)s.className='f';pip.append(s)}
+    b.append(pip,document.createTextNode(lab));
+    b.addEventListener('click',()=>pick(i+1));box.append(b);
+  });
+}
+function pick(v){
+  if(lock)return;lock=true;
+  answers[idx]=v;save();
+  [...$('opts').children].forEach((b,i)=>b.setAttribute('aria-pressed',i+1===v?'true':'false'));
+  setTimeout(()=>{lock=false;if(idx<Q.length-1){idx++;save();renderQ()}else finish()},200);
+}
+
+function means(){const s={},n={};F.forEach(c=>{s[c.n]=0;n[c.n]=0});Q.forEach(([f],i)=>{if(answers[i]){s[f]+=answers[i];n[f]++}});const m={};F.forEach(c=>m[c.n]=n[c.n]?s[c.n]/n[c.n]:0);return m}
+function decide(m){
+  let heavy=null;for(let f=1;f<=8;f++){if(m[f]>=TH&&(!heavy||m[f]>m[heavy]))heavy=f}
+  if(heavy)return heavy;
+  if(m[9]>=TH){let cur=9,f=10;while(f<=17){if(m[f]>=TH){cur=f;f++}else if(f+1<=17&&m[f+1]>=TH){cur=f+1;f+=2}else break}return cur}
+  let best=1;for(let f=1;f<=8;f++){if(m[f]>=m[best])best=f}return best;
+}
+
+let M=null,ME=null,VIEW=null;
+function renderTower(){
+  const t=$('tower');t.textContent='';
+  for(let f=17;f>=1;f--){
+    const c=F[f-1];
+    if(f===8){const g=document.createElement('div');g.className='gate';g.textContent='200 · 전환점';t.append(g)}
+    const b=document.createElement('button');b.type='button';
+    b.className='fl'+(f>=9?' up':'')+(f===ME?' me':'')+(f===VIEW?' view':'');
+    b.innerHTML=`<span class="n">${f}F</span>${art(f)}<span class="nm">${c.emo}<small>${f===ME?'지금 여기':c.name}</small></span><span class="m" aria-hidden="true"><i style="width:${Math.max(0,(M[f]-1)/4*100)}%"></i></span>`;
+    b.setAttribute('aria-label',`${f}층 ${c.emo}, 평균 ${M[f].toFixed(1)}점${f===ME?', 현재 내 층':''}. 카드 보기`);
+    b.addEventListener('click',()=>openPeek(f));
+    t.append(b);
+  }
+}
+function openPeek(f){
+  if(f===ME){VIEW=null;renderTower();$('peek').hidden=true;$('myCard').scrollIntoView({behavior:'smooth',block:'start'});return}
+  VIEW=f;renderTower();
+  const p=$('peek');
+  p.innerHTML=`<button class="sub close" type="button" id="closePeek">닫기 ✕</button>`+card(F[f-1]);
+  p.hidden=false;$('closePeek').addEventListener('click',()=>{p.hidden=true;VIEW=null;renderTower()});
+  p.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function finish(){
+  M=means();ME=decide(M);VIEW=null;const c=F[ME-1];
+  $('myFloor').textContent=ME+'F';
+  $('myLine').textContent=ME>=9?`${c.emo} 층의 ${c.name}와 함께 지내고 있어요. 200을 넘어 삶을 살리는 힘이 움직이는 층이에요.`:`${c.emo} 층의 ${c.name}와 함께 지내고 있어요. 지금은 마음을 무겁게 하는 감정이 조금 크게 자리 잡고 있어요.`;
+  $('myCard').innerHTML=card(c);
+  $('peek').hidden=true;renderTower();
+  $('warn').hidden=!(M[3]>=TH||M[4]>=TH);
+  const power=ME>=9, on=power?$('blkPower'):$('blkForce'), off=power?$('blkForce'):$('blkPower');
+  on.classList.add('on');off.classList.remove('on');
+  const ob=on.querySelector('.here-badge'), fb=off.querySelector('.here-badge');
+  ob.hidden=false;ob.innerHTML=art(ME)+'지금 여기';fb.hidden=true;
+  $('fpMsg').innerHTML=power?
+   `<strong>지금 나를 움직이는 힘은 '파워'예요.</strong>
+    <p>용기, 수용, 사랑 같은 힘이 나를 움직이고 있어요. 덜 애써도 단단하고, 부부 관계도 함께 걷는 길이 되어 가요.</p>
+    <p>위로 올라갈수록 사는 게 편해져요. 지금의 힘을 관계에 쓰면 부부 관계도 한 층 더 올라가요.</p>
+    <p>다만 파워는 한 번 얻으면 끝이 아니에요. 힘든 시기엔 언제든 200 아래로 내려갈 수 있어요. 흔들리는 날 돌아올 방법을 신디와 함께 만들어 두세요.</p>`
+   :
+   `<strong>지금 나를 움직이는 힘은 '포스'예요.</strong>
+    <p>지금은 수치심, 두려움, 분노 같은 감정이 나를 밀어붙이고 있어요. 그래서 열심히 애쓰는데도 자꾸 지치고, 부부 관계도 이기고 지는 싸움처럼 느껴질 수 있어요.</p>
+    <p>위로 올라갈수록 사는 게 편해져요. 부부 관계를 해결하고 싶다면 이 의식 수준을 높여야 해요.</p>
+    <p>첫 계단은 200, 용기예요. 남 탓 대신 '내가 할 수 있는 한 가지'를 찾는 순간 포스가 파워로 바뀌기 시작해요. 용기를 내 보세요.</p>
+    <p>지금까지의 인생이 200 아래에 계속 머물러 있었다면 혼자 올라가기보다 도움이 필요할 거예요. 신디와 함께 한 층씩 높여 봐요.</p>`;
+  clear();show('result');
+}
+
+$('start').addEventListener('click',()=>{answers=new Array(Q.length).fill(0);idx=0;save();show('quiz');renderQ()});
+$('resume').addEventListener('click',()=>{show('quiz');renderQ()});
+$('back').addEventListener('click',()=>{if(idx>0){idx--;save();renderQ()}});
+$('retake').addEventListener('click',()=>{clear();$('resume').hidden=true;show('cover')});
+const SHARE_URL=location.origin+location.pathname;
+let toastT=null;
+function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2400)}
+$('share').addEventListener('click',async()=>{
+  const c=F[(ME||1)-1];
+  const text=`나의 의식 수준은 ${ME}층, ${c.emo}의 ${c.name}! 너는 몇 층일까? 나의 의식 수준은 몇 층일까 테스트 → ${SHARE_URL}`;
+  try{if(navigator.share){await navigator.share({title:'나의 의식 수준은 몇 층일까?',text});return}}catch(e){}
+  try{await navigator.clipboard.writeText(text);toast('결과 문구를 복사했어요. 붙여 넣어 공유해 보세요')}
+  catch(e){toast('복사가 안 돼요. 화면을 캡처해서 공유해 주세요')}
+});
+const saved=load();
+if(saved&&saved.answers.some(a=>a)){answers=saved.answers;idx=Math.min(saved.idx,Q.length-1);$('resume').hidden=false;$('resume').textContent='이어서 하기 ('+(idx+1)+'번 문항부터)'}
+</script>
+
+</body>
+</html>
