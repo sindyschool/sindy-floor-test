@@ -121,6 +121,10 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .gate::before,.gate::after{content:"";flex:1;border-top:2.5px dashed var(--accent)}
 .warn{background:var(--warn);color:var(--warn-ink);border:2.5px solid var(--ink);border-radius:20px;padding:14px 16px;font-size:14px;display:flex;flex-direction:column;gap:4px}
 .warn strong{font-size:15px}
+.warn p,.warn small{word-break:keep-all}
+.warn p{margin:0;line-height:1.6}
+.warn-cta{align-self:flex-start;margin-top:6px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;border-radius:999px;padding:10px 16px;font-size:14px}
+.warn small{margin-top:6px;font-size:12px;opacity:.8;line-height:1.5}
 details.box summary{cursor:pointer;font-weight:900;font-size:15px;min-height:28px;list-style:none;display:flex;justify-content:space-between}
 details.box summary::after{content:"+";font-family:var(--display);font-size:22px;line-height:1}
 details[open].box summary::after{content:"–"}
@@ -217,8 +221,11 @@ a.cta{display:block;text-align:center;text-decoration:none}
       </div>
       <div id="myCard"></div>
       <div id="warn" class="warn" hidden>
-        <strong>혼자 견디지 않아도 돼요</strong>
-        <p>요즘 많이 지치고 마음이 가라앉아 있는 것 같아요. 신디 상담사와 이야기를 나눠 보는 것도 좋아요. 마음이 너무 힘들 땐 자살예방상담전화 109, 정신건강위기상담전화 1577-0199에 언제든 전화할 수 있어요.</p>
+        <strong>요즘 마음이 많이 무거웠죠</strong>
+        <p>기운이 없고 마음이 자꾸 가라앉는 건, 그만큼 오래 애써 왔다는 신호예요. 이런 마음은 혼자 붙들고 있을수록 더 무거워져요.</p>
+        <p>신디 상담사에게 지금 마음을 있는 그대로 꺼내 보세요. 무슨 말부터 해야 할지 몰라도 괜찮아요. 들어 주는 사람이 있다는 것만으로 마음이 한 층 가벼워질 수 있어요.</p>
+        <a class="warn-cta" href="https://sindytown.com/counseling/be3acc7a-e5dd-49f9-ad3c-7dd01c94c865" target="_blank" rel="noopener">신디 상담사에게 털어놓기</a>
+        <small>지금 당장 너무 힘들다면 109(자살예방상담), 1577-0199(정신건강위기상담)에서 24시간 이야기를 들어 줘요.</small>
       </div>
       <div class="box">
         <h2>나의 의식 수준은 여기</h2>
