@@ -627,21 +627,18 @@ function decide(m){
   const Fp=0.5*mean(fv)+0.5*Math.max(...fv), P=mean(pv), D=P-Fp;
   if(D<0.2){
     // 포스가 셀수록 더 깊은 층. 그 근처에서 가장 강하게 응답한 감정의 층을 고른다.
-    const L=Math.max(1,Math.min(8,8.6+2*D));
+    const L=Math.max(1,Math.min(8,8.6+3*D));
     let best=1,bs=-1e9;for(let f=1;f<=8;f++){const s=m[f]-0.12*Math.abs(f-L);if(s>bs){bs=s;best=f}}
     return best;
   }
-  // 파워: 9층에서 한 층씩 차례로 올라간다. 위로 갈수록 문턱이 높아진다.
+  // 파워: 파워와 포스의 차이만큼 9층부터 올라간다.
   // 13층 이상은 아래층 감정이 낮아야, 15~16층은 극소수만. 17층(깨달음)은 결과로 주지 않는다.
-  let L=9;
-  for(let f=10;f<=16;f++){
-    const cut=Math.max(3.5+0.15*(f-10),Fp+1.2);
-    if(m[f]<cut) break;
-    if(f>=13&&Fp>2.5) break;
-    if(f>=15&&(Fp>1.75||mean([m[13],m[14],m[15],m[16]])<4.5)) break;
-    L=f;
-  }
-  return L;
+  let cap=16;
+  if(Fp>2.5) cap=12;
+  else if(Fp>1.75||mean([m[13],m[14],m[15],m[16]])<4.5) cap=14;
+  const L=Math.min(cap,8.8+2.5*(D-0.2)), Lr=Math.round(L);
+  let best=Lr,bs=-1e9;for(let f=Math.max(9,Lr-1);f<=Math.min(cap,Lr+1);f++){const s=m[f]-0.5*Math.abs(f-L);if(s>bs){bs=s;best=f}}
+  return best;
 }
 
 let M=null,ME=null,VIEW=null;
